@@ -41,4 +41,3 @@ driver = {
     'oracle': 'oracle.jdbc.driver.OracleDriver',
     'postgresql': 'org.postgresql.Driver',
 }
-

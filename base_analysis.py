@@ -19,8 +19,7 @@ class Analysis:
 
     """
 
-    def __init__(self, jdbc: Config, app_name='defaultAppName'):
-        self.__jdbc__ = jdbc
+    def __init__(self, app_name='defaultAppName'):
         self.__sc__, self.__spark__ = __spark_instance__(app_name)
 
     def start(self):
@@ -47,14 +46,21 @@ class Analysis:
         """
         print('target table: {}'.format(table))
         if jdbc is None:
-            jdbc = self.__jdbc__
+            raise Exception("jdbc is none.")
         df.write.jdbc(url=jdbc.url(), table=table, mode=mode, properties=jdbc.properties())
 
     def __read_from_db__(self, table, jdbc: Config = None) -> DataFrame:
         if jdbc is None:
-            jdbc = self.__jdbc__
+            raise Exception("jdbc is none.")
         return self.__spark__.read.jdbc(url=jdbc.url(), table=table, properties=jdbc.properties())
+
+    def __read_from_csv__(self, path) -> DataFrame:
+        return self.__spark__.read.csv(path)
 
     def __save_to_csv__(self, df: DataFrame, path, mode='overwrite'):
         print('target csv: {}'.format(path))
         df.repartition(1).write.csv(path, mode, header=True)
+
+    def __save_to_json__(self, df: DataFrame, path, mode='overwrite'):
+        print('target json: {}'.format(path))
+        df.repartition(1).write.json(path, mode)
